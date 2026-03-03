@@ -14,7 +14,6 @@ st.markdown("""
     background-size: cover;
 }
 
-/* Efecto de patrón tecnológico */
 .stApp::before {
     content:"";
     position: fixed;
@@ -37,7 +36,7 @@ h1, h2, h3, p {
 </style>
 """, unsafe_allow_html=True)
 
-# --- BASE DE DATOS DE PREGUNTAS ---
+# --- BASE DE DATOS DE PREGUNTAS (20 preguntas) ---
 if 'pool_preguntas' not in st.session_state:
     st.session_state.pool_preguntas = [
         {"p": "¿Cuántos bits tiene un nibble?",
@@ -105,7 +104,7 @@ if 'pool_preguntas' not in st.session_state:
     random.shuffle(st.session_state.pool_preguntas)
 
 # --- ESTADO DEL JUEGO ---
-if 'indice' not in st.session_state:
+if "indice" not in st.session_state:
     st.session_state.indice = 0
     st.session_state.puntos = 0
     st.session_state.juego_terminado = False
@@ -118,26 +117,17 @@ st.divider()
 total_preguntas = len(st.session_state.pool_preguntas)
 
 # Barra de progreso
-progreso = st.session_state.indice / total_preguntas
-st.progress(progreso)
+st.progress(st.session_state.indice / total_preguntas)
 
-# ================= TIMER LOGIC =================
+# ================= TIMER =================
+
 TIEMPO_LIMITE = 10
-# ================= TIMER QUE CORRE AUTOMÁTICAMENTE =================
 
 def tiempo_restante():
-    """Calcula el tiempo restante desde que inicia la pregunta"""
     transcurrido = time.time() - st.session_state.start_time
     return max(0, int(TIEMPO_LIMITE - transcurrido))
 
-def verificar_tiempo_y_avanzar():
-    """Si el tiempo se acaba, cuenta como incorrecto y pasa a la siguiente pregunta"""
-    st.error("⏰ Tiempo agotado! Se cuenta como respuesta incorrecta.")
-    time.sleep(1)
-    avanzar_pregunta(correcto=False)
-
 def avanzar_pregunta(correcto=False):
-    """Avanza a la siguiente pregunta y reinicia timer"""
     if correcto:
         st.session_state.puntos += 1
 
@@ -149,40 +139,49 @@ def avanzar_pregunta(correcto=False):
 
     st.rerun()
 
+def tiempo_agotado():
+    st.error("⏰ Tiempo agotado! Se cuenta como respuesta incorrecta.")
+    time.sleep(1)
+    avanzar_pregunta(correcto=False)
+
 # ================= PANTALLA DEL JUEGO =================
 
 if not st.session_state.juego_terminado:
 
     pregunta_actual = st.session_state.pool_preguntas[st.session_state.indice]
 
-    # Verificar tiempo
-    tiempo_restante = tiempo_restante()
-
-# Si el tiempo termina automáticamente
-if tiempo_restante <= 0:
-    verificar_tiempo_y_avanzar()
+    t_rest = tiempo_restante()
 
     st.subheader(f"Pregunta {st.session_state.indice + 1} de {total_preguntas}")
     st.write(f"### {pregunta_actual['p']}")
 
-    st.info(f"⏳ Tiempo restante: {tiempo_restante} s")
+    st.info(f"⏳ Tiempo restante: {t_rest} s")
 
-    opciones = pregunta_actual['o']
-    seleccion = st.radio("Selecciona una respuesta:", opciones, key=f"radio_{st.session_state.indice}")
+    # Si el tiempo se acaba automáticamente
+    if t_rest <= 0:
+        tiempo_agotado()
+
+    opciones = pregunta_actual["o"]
+
+    seleccion = st.radio(
+        "Selecciona una respuesta:",
+        opciones,
+        key=f"radio_{st.session_state.indice}"
+    )
 
     if st.button("Confirmar respuesta"):
 
-        if seleccion == pregunta_actual['c']:
+        if seleccion == pregunta_actual["c"]:
             st.success("✅ ¡Correcto!")
             time.sleep(1)
             avanzar_pregunta(correcto=True)
-
         else:
             st.error(f"❌ Incorrecto. La respuesta correcta es: {pregunta_actual['c']}")
             time.sleep(1)
             avanzar_pregunta(correcto=False)
 
 else:
+
     st.header("🏁 Fin del examen")
 
     puntos = st.session_state.puntos
@@ -192,7 +191,6 @@ else:
 
     porcentaje = (puntos / total) * 100
 
-    # Celebraciones especiales
     if puntos >= 20:
         st.balloons()
         st.snow()
@@ -215,5 +213,4 @@ else:
         random.shuffle(st.session_state.pool_preguntas)
         st.session_state.start_time = time.time()
         st.rerun()
-
 
