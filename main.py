@@ -1,65 +1,101 @@
-﻿import streamlit as st
+import streamlit as st
 import random
 import time
 
+# --- CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(page_title="Aprendiendo Electrónica Digital ⚡", page_icon="⚡")
 
-# --- BANCO GRANDE DE PREGUNTAS (puedes agregar más aquí) ---
-banco_preguntas = [
+# --- BASE DE DATOS DE PREGUNTAS (20 preguntas) ---
+if 'pool_preguntas' not in st.session_state:
+    st.session_state.pool_preguntas = [
+        {"p": "¿Cuántos bits tiene un nibble?", 
+         "o": ["2 bits", "4 bits", "8 bits", "16 bits"], 
+         "c": "4 bits"},
 
-    {"p": "¿Cuántos bits tiene un nibble?", 
-     "o": ["2 bits", "4 bits", "8 bits", "16 bits"], 
-     "c": "4 bits"},
+        {"p": "¿Cuántos bits tiene un byte?", 
+         "o": ["4", "8", "16", "32"], 
+         "c": "8"},
 
-    {"p": "¿Cuántos bits tiene un byte?", 
-     "o": ["4", "8", "16", "32"], 
-     "c": "8"},
+        {"p": "¿Cuál es la salida de una compuerta AND si ambas entradas son 1?", 
+         "o": ["0", "1", "Depende del voltaje", "Indefinido"], 
+         "c": "1"},
 
-    {"p": "¿Cuál es la salida de una compuerta AND si ambas entradas son 1?", 
-     "o": ["0", "1", "Depende del voltaje", "Indefinido"], 
-     "c": "1"},
+        {"p": "¿Cuál es la salida de una compuerta OR si una entrada es 1?", 
+         "o": ["0", "1", "Depende de la otra entrada", "Indefinido"], 
+         "c": "1"},
 
-    {"p": "¿Qué compuerta invierte su entrada?", 
-     "o": ["AND", "OR", "NOT", "XOR"], 
-     "c": "NOT"},
+        {"p": "¿Qué compuerta lógica invierte su entrada?", 
+         "o": ["AND", "OR", "NOT", "XOR"], 
+         "c": "NOT"},
 
-    {"p": "¿Qué número decimal representa el binario 1101?", 
-     "o": ["11", "12", "13", "14"], 
-     "c": "13"},
+        {"p": "¿Qué número decimal representa el binario 1101?", 
+         "o": ["11", "12", "13", "14"], 
+         "c": "13"},
 
-    {"p": "¿Cuántos valores puede representar 4 bits?", 
-     "o": ["8", "12", "16", "32"], 
-     "c": "16"},
+        {"p": "¿Qué compuerta da salida 1 solo cuando las entradas son diferentes?", 
+         "o": ["AND", "OR", "XOR", "NAND"], 
+         "c": "XOR"},
 
-    {"p": "¿Qué compuerta es la negación de AND?", 
-     "o": ["NOR", "NAND", "XOR", "NOT"], 
-     "c": "NAND"},
+        {"p": "¿Qué compuerta es la negación de AND?", 
+         "o": ["NOR", "NAND", "XOR", "NOT"], 
+         "c": "NAND"},
 
-    {"p": "¿Qué compuerta es la negación de OR?", 
-     "o": ["NAND", "NOR", "XOR", "NOT"], 
-     "c": "NOR"},
+        {"p": "¿Qué compuerta es la negación de OR?", 
+         "o": ["NAND", "NOR", "XOR", "NOT"], 
+         "c": "NOR"},
 
-    {"p": "¿Cuál es el resultado de 1 AND 0?", 
-     "o": ["0", "1", "Indefinido", "Depende"], 
-     "c": "0"},
+        {"p": "En sistema binario solo existen los valores:", 
+         "o": ["0 y 1", "0,1,2", "1 y 2", "0 y 2"], 
+         "c": "0 y 1"},
 
-    {"p": "¿Cuál es el resultado de NOT 1?", 
-     "o": ["0", "1", "Indefinido", "2"], 
-     "c": "0"},
+        {"p": "Un flip-flop se utiliza principalmente para:", 
+         "o": ["Sumar", "Almacenar un bit", "Multiplicar", "Convertir señales"], 
+         "c": "Almacenar un bit"},
 
-    # Puedes agregar 20 más aquí 👇
-]
+        {"p": "¿Qué dispositivo realiza operaciones aritméticas y lógicas?", 
+         "o": ["ALU", "RAM", "Fuente", "Display"], 
+         "c": "ALU"},
 
-# --- FUNCIÓN PARA INICIAR EXAMEN NUEVO ---
-def iniciar_examen():
-    st.session_state.pool_preguntas = random.sample(banco_preguntas, 5)  # Toma 5 aleatorias
+        {"p": "El código ASCII se utiliza para:", 
+         "o": ["Representar caracteres", "Medir voltaje", "Multiplicar binarios", "Diseñar circuitos"], 
+         "c": "Representar caracteres"},
+
+        {"p": "¿Cuántos valores puede representar 3 bits?", 
+         "o": ["4", "6", "8", "16"], 
+         "c": "8"},
+
+        {"p": "¿Cuál es el resultado de 1 AND 0?", 
+         "o": ["0", "1", "Indefinido", "Depende"], 
+         "c": "0"},
+
+        {"p": "¿Cuál es el resultado de 1 OR 0?", 
+         "o": ["0", "1", "Indefinido", "Depende"], 
+         "c": "1"},
+
+        {"p": "¿Cuál es el resultado de NOT 1?", 
+         "o": ["0", "1", "Indefinido", "2"], 
+         "c": "0"},
+
+        {"p": "Un contador digital se utiliza para:", 
+         "o": ["Contar pulsos", "Sumar voltaje", "Medir resistencia", "Convertir corriente"], 
+         "c": "Contar pulsos"},
+
+        {"p": "¿Qué sistema numérico utiliza base 16?", 
+         "o": ["Binario", "Decimal", "Hexadecimal", "Octal"], 
+         "c": "Hexadecimal"},
+
+        {"p": "¿Cuántos valores puede representar 4 bits?", 
+         "o": ["8", "12", "16", "32"], 
+         "c": "16"},
+    ]
+
+    random.shuffle(st.session_state.pool_preguntas)
+
+# --- ESTADO DEL JUEGO ---
+if 'indice' not in st.session_state:
     st.session_state.indice = 0
     st.session_state.puntos = 0
     st.session_state.juego_terminado = False
-
-# Inicialización
-if 'pool_preguntas' not in st.session_state:
-    iniciar_examen()
 
 # --- INTERFAZ ---
 st.title("⚡ Aprendiendo Electrónica Digital")
@@ -67,6 +103,7 @@ st.divider()
 
 total_preguntas = len(st.session_state.pool_preguntas)
 
+# Barra de progreso
 progreso = st.session_state.indice / total_preguntas
 st.progress(progreso)
 
@@ -77,14 +114,15 @@ if not st.session_state.juego_terminado:
     st.subheader(f"Pregunta {st.session_state.indice + 1} de {total_preguntas}")
     st.write(f"### {pregunta_actual['p']}")
 
-    seleccion = st.radio("Selecciona una respuesta:", pregunta_actual['o'])
+    opciones = pregunta_actual['o']
+    seleccion = st.radio("Selecciona una respuesta:", opciones)
 
     if st.button("Confirmar respuesta"):
         if seleccion == pregunta_actual['c']:
-            st.success("✅ Correcto")
+            st.success("✅ ¡Correcto!")
             st.session_state.puntos += 1
         else:
-            st.error(f"❌ Incorrecto. Respuesta correcta: {pregunta_actual['c']}")
+            st.error(f"❌ Incorrecto. La respuesta correcta es: {pregunta_actual['c']}")
 
         time.sleep(1)
 
@@ -99,6 +137,19 @@ else:
     st.header("🏁 Fin del examen")
     st.metric("Puntuación Final", f"{st.session_state.puntos} / {total_preguntas}")
 
-    if st.button("Reintentar examen"):
-        iniciar_examen()  # 🔥 Aquí está la magia
+    porcentaje = (st.session_state.puntos / total_preguntas) * 100
+
+    if porcentaje >= 80:
+        st.balloons()
+        st.success("🌟 Excelente dominio de Electrónica Digital")
+    elif porcentaje >= 60:
+        st.info("👍 Buen trabajo, pero puedes mejorar")
+    else:
+        st.warning("📘 Debes repasar los conceptos básicos")
+
+    if st.button("Reintentar"):
+        st.session_state.indice = 0
+        st.session_state.puntos = 0
+        st.session_state.juego_terminado = False
+        random.shuffle(st.session_state.pool_preguntas)
         st.rerun()
