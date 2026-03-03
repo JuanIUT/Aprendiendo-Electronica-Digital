@@ -123,6 +123,18 @@ st.progress(progreso)
 
 # ================= TIMER LOGIC =================
 TIEMPO_LIMITE = 10
+# ================= TIMER QUE CORRE AUTOMÁTICAMENTE =================
+
+def tiempo_restante():
+    """Calcula el tiempo restante desde que inicia la pregunta"""
+    transcurrido = time.time() - st.session_state.start_time
+    return max(0, int(TIEMPO_LIMITE - transcurrido))
+
+def verificar_tiempo_y_avanzar():
+    """Si el tiempo se acaba, cuenta como incorrecto y pasa a la siguiente pregunta"""
+    st.error("⏰ Tiempo agotado! Se cuenta como respuesta incorrecta.")
+    time.sleep(1)
+    avanzar_pregunta(correcto=False)
 
 def avanzar_pregunta(correcto=False):
     """Avanza a la siguiente pregunta y reinicia timer"""
@@ -144,13 +156,11 @@ if not st.session_state.juego_terminado:
     pregunta_actual = st.session_state.pool_preguntas[st.session_state.indice]
 
     # Verificar tiempo
-    tiempo_transcurrido = time.time() - st.session_state.start_time
-    tiempo_restante = max(0, int(TIEMPO_LIMITE - tiempo_transcurrido))
+    tiempo_restante = tiempo_restante()
 
-    if tiempo_transcurrido > TIEMPO_LIMITE:
-        st.error("⏰ Tiempo agotado! Se cuenta como respuesta incorrecta.")
-        time.sleep(1)
-        avanzar_pregunta(correcto=False)
+# Si el tiempo termina automáticamente
+if tiempo_restante <= 0:
+    verificar_tiempo_y_avanzar()
 
     st.subheader(f"Pregunta {st.session_state.indice + 1} de {total_preguntas}")
     st.write(f"### {pregunta_actual['p']}")
@@ -205,4 +215,5 @@ else:
         random.shuffle(st.session_state.pool_preguntas)
         st.session_state.start_time = time.time()
         st.rerun()
+
 
