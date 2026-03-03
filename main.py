@@ -1,6 +1,8 @@
 import streamlit as st
 import random
 import time
+import pandas as pd
+import os
 
 # ================= CONFIGURACIÓN =================
 
@@ -19,6 +21,37 @@ h1,h2,h3,p{
 
 </style>
 """, unsafe_allow_html=True)
+
+# ================= RANKING SISTEMA =================
+
+ARCHIVO_RANKING = "ranking_electronica.csv"
+
+if not os.path.exists(ARCHIVO_RANKING):
+    df = pd.DataFrame(columns=["Nombre", "Puntaje"])
+    df.to_csv(ARCHIVO_RANKING, index=False)
+
+def guardar_ranking(nombre, puntaje):
+
+    df = pd.read_csv(ARCHIVO_RANKING)
+
+    nueva_fila = pd.DataFrame([{
+        "Nombre": nombre,
+        "Puntaje": puntaje
+    }])
+
+    df = pd.concat([df, nueva_fila], ignore_index=True)
+    df.to_csv(ARCHIVO_RANKING, index=False)
+
+def asignar_medalla(pos):
+
+    if pos == 0:
+        return "🥇 Oro"
+    elif pos == 1:
+        return "🥈 Plata"
+    elif pos == 2:
+        return "🥉 Bronce"
+    else:
+        return "⭐ Participación"
 
 # ================= BIENVENIDA =================
 
@@ -41,7 +74,6 @@ def pantalla_bienvenida():
         st.session_state.start_time = time.time()
         st.rerun()
 
-# Mostrar bienvenida si no hay usuario
 if st.session_state.nombre_usuario == "":
     pantalla_bienvenida()
     st.stop()
@@ -49,6 +81,7 @@ if st.session_state.nombre_usuario == "":
 # ================= PREGUNTAS =================
 
 if 'pool_preguntas' not in st.session_state:
+
     st.session_state.pool_preguntas = [
         {"p": "¿Cuántos bits tiene un nibble?",
          "o": ["2 bits", "4 bits", "8 bits", "16 bits"],
@@ -197,29 +230,32 @@ else:
     puntos = st.session_state.puntos
     total = total_preguntas
 
+    # Guardar ranking
+    guardar_ranking(st.session_state.nombre_usuario, puntos)
+
     st.metric("Puntuación Final", f"{puntos} / {total}")
 
     st.success(f"👤 Nombre: {st.session_state.nombre_usuario}")
     st.success(f"📊 Puntaje obtenido: {puntos} / {total}")
 
-    porcentaje = (puntos / total) * 100
+    st.subheader("🏆 Ranking Histórico")
 
-    if puntos >= 20:
-        st.balloons()
-        st.snow()
-        st.success("🎉 Excelente dominio")
-    elif puntos >= 18:
-        st.balloons()
-        st.success("🎈 Muy buen desempeño")
-    elif porcentaje >= 60:
-        st.info("👍 Buen trabajo")
-    else:
-        st.warning("📘 Debes repasar")
+    ranking_df = pd.read_csv(ARCHIVO_RANKING)
+    ranking_df = ranking_df.sort_values(by="Puntaje", ascending=False).reset_index(drop=True)
+
+    ranking_df["Posición"] = ranking_df.index
+    ranking_df["Medalla"] = ranking_df["Posición"].apply(asignar_medalla)
+
+    st.dataframe(ranking_df[["Posición", "Nombre", "Puntaje", "Medalla"]])
 
     if st.button("Reintentar"):
+
         st.session_state.indice = 0
         st.session_state.puntos = 0
         st.session_state.juego_terminado = False
+
         random.shuffle(st.session_state.pool_preguntas)
+
         st.session_state.start_time = time.time()
         st.rerun()
+
