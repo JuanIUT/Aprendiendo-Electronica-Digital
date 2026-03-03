@@ -2,31 +2,15 @@ import streamlit as st
 import random
 import time
 
-# --- CONFIGURACIÓN DE LA PÁGINA ---
+# ================= CONFIGURACIÓN =================
+
 st.set_page_config(page_title="Aprendiendo Electrónica Digital ⚡", page_icon="⚡", layout="centered")
 
-# --- ESTILO VISUAL TECNOLÓGICO ---
 st.markdown("""
 <style>
 
 .stApp {
     background: linear-gradient(135deg, #020024, #043d7a, #021b3a);
-}
-
-/* patrón tecnológico */
-.stApp::before {
-    content:"";
-    position: fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    opacity:0.08;
-    background-image:
-        radial-gradient(circle at 25px 25px, #00e5ff 2px, transparent 0),
-        radial-gradient(circle at 75px 75px, #00e5ff 2px, transparent 0);
-    background-size: 100px 100px;
-    pointer-events:none;
 }
 
 h1,h2,h3,p{
@@ -36,7 +20,34 @@ h1,h2,h3,p{
 </style>
 """, unsafe_allow_html=True)
 
-# --- BASE DE DATOS DE PREGUNTAS (20 preguntas) ---
+# ================= BIENVENIDA =================
+
+if "nombre_usuario" not in st.session_state:
+    st.session_state.nombre_usuario = ""
+
+def pantalla_bienvenida():
+
+    st.title("🎯 BIENVENIDO A LA PRUEBA DE ELECTRONICA-DIGITAL")
+
+    nombre = st.text_input("POR FAVOR INGRESE SU NOMBRE:")
+
+    if st.button("Comenzar prueba"):
+
+        if nombre.strip() == "":
+            st.warning("Debe ingresar un nombre para continuar")
+            return
+
+        st.session_state.nombre_usuario = nombre
+        st.session_state.start_time = time.time()
+        st.rerun()
+
+# Mostrar bienvenida si no hay usuario
+if st.session_state.nombre_usuario == "":
+    pantalla_bienvenida()
+    st.stop()
+
+# ================= PREGUNTAS =================
+
 if 'pool_preguntas' not in st.session_state:
     st.session_state.pool_preguntas = [
         {"p": "¿Cuántos bits tiene un nibble?",
@@ -103,7 +114,8 @@ if 'pool_preguntas' not in st.session_state:
 
     random.shuffle(st.session_state.pool_preguntas)
 
-# --- ESTADO DEL JUEGO ---
+# ================= ESTADO DEL JUEGO =================
+
 if "indice" not in st.session_state:
     st.session_state.indice = 0
     st.session_state.puntos = 0
@@ -112,11 +124,11 @@ if "indice" not in st.session_state:
 
 total_preguntas = len(st.session_state.pool_preguntas)
 
-# ================= TIMER EN TIEMPO REAL (SOLO SE AÑADIÓ ESTO) =================
+# ================= TIMER =================
 
 TIEMPO_LIMITE = 10
 
-def tiempo_restante():
+def obtener_tiempo_restante():
     transcurrido = time.time() - st.session_state.start_time
     return max(0, TIEMPO_LIMITE - int(transcurrido))
 
@@ -133,7 +145,8 @@ def avanzar_pregunta(correcto=False):
 
     st.rerun()
 
-# --- INTERFAZ ---
+# ================= INTERFAZ =================
+
 st.title("⚡ Aprendiendo Electrónica Digital")
 st.divider()
 
@@ -145,24 +158,21 @@ if not st.session_state.juego_terminado:
 
     pregunta_actual = st.session_state.pool_preguntas[st.session_state.indice]
 
-    tiempo = tiempo_restante()
+    tiempo = obtener_tiempo_restante()
 
     st.subheader(f"Pregunta {st.session_state.indice + 1} de {total_preguntas}")
     st.write(f"### {pregunta_actual['p']}")
 
     st.info(f"⏳ Tiempo restante: {tiempo} s")
 
-    # Si el tiempo se acaba se avanza automáticamente
     if tiempo <= 0:
         st.error("⏰ Tiempo agotado! Se cuenta como respuesta incorrecta.")
         time.sleep(1)
         avanzar_pregunta(False)
 
-    opciones = pregunta_actual["o"]
-
     seleccion = st.radio(
         "Selecciona una respuesta:",
-        opciones,
+        pregunta_actual["o"],
         key=f"radio_{st.session_state.indice}"
     )
 
@@ -178,6 +188,8 @@ if not st.session_state.juego_terminado:
             time.sleep(1)
             avanzar_pregunta(False)
 
+# ================= RESULTADOS =================
+
 else:
 
     st.header("🏁 Fin del examen")
@@ -186,6 +198,9 @@ else:
     total = total_preguntas
 
     st.metric("Puntuación Final", f"{puntos} / {total}")
+
+    st.success(f"👤 Nombre: {st.session_state.nombre_usuario}")
+    st.success(f"📊 Puntaje obtenido: {puntos} / {total}")
 
     porcentaje = (puntos / total) * 100
 
