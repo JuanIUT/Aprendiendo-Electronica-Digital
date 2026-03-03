@@ -27,8 +27,7 @@ h1,h2,h3,p{
 ARCHIVO_RANKING = "ranking_electronica.csv"
 
 if not os.path.exists(ARCHIVO_RANKING):
-    df = pd.DataFrame(columns=["Nombre", "Puntaje"])
-    df.to_csv(ARCHIVO_RANKING, index=False)
+    pd.DataFrame(columns=["Nombre", "Puntaje"]).to_csv(ARCHIVO_RANKING, index=False)
 
 def guardar_ranking(nombre, puntaje):
 
@@ -53,10 +52,18 @@ def asignar_medalla(pos):
     else:
         return "⭐ Participación"
 
-# ================= BIENVENIDA =================
+# ================= ESTADO GLOBAL =================
 
 if "nombre_usuario" not in st.session_state:
     st.session_state.nombre_usuario = ""
+
+if "indice" not in st.session_state:
+    st.session_state.indice = 0
+    st.session_state.puntos = 0
+    st.session_state.juego_terminado = False
+    st.session_state.start_time = time.time()
+
+# ================= BIENVENIDA =================
 
 def pantalla_bienvenida():
 
@@ -71,8 +78,14 @@ def pantalla_bienvenida():
             return
 
         st.session_state.nombre_usuario = nombre
+        st.session_state.indice = 0
+        st.session_state.puntos = 0
+        st.session_state.juego_terminado = False
         st.session_state.start_time = time.time()
+
         st.rerun()
+
+# ================= MOSTRAR BIENVENIDA SI NO HAY USUARIO =================
 
 if st.session_state.nombre_usuario == "":
     pantalla_bienvenida()
@@ -147,16 +160,6 @@ if 'pool_preguntas' not in st.session_state:
 
     random.shuffle(st.session_state.pool_preguntas)
 
-# ================= ESTADO DEL JUEGO =================
-
-if "indice" not in st.session_state:
-    st.session_state.indice = 0
-    st.session_state.puntos = 0
-    st.session_state.juego_terminado = False
-    st.session_state.start_time = time.time()
-
-total_preguntas = len(st.session_state.pool_preguntas)
-
 # ================= TIMER =================
 
 TIEMPO_LIMITE = 10
@@ -173,19 +176,21 @@ def avanzar_pregunta(correcto=False):
     st.session_state.indice += 1
     st.session_state.start_time = time.time()
 
-    if st.session_state.indice >= total_preguntas:
+    if st.session_state.indice >= len(st.session_state.pool_preguntas):
         st.session_state.juego_terminado = True
 
     st.rerun()
 
-# ================= INTERFAZ =================
+# ================= INTERFAZ DEL JUEGO =================
 
 st.title("⚡ Aprendiendo Electrónica Digital")
 st.divider()
 
+total_preguntas = len(st.session_state.pool_preguntas)
+
 st.progress(st.session_state.indice / total_preguntas)
 
-# ================= PANTALLA DEL JUEGO =================
+# ================= PANTALLA DE EXAMEN =================
 
 if not st.session_state.juego_terminado:
 
@@ -230,7 +235,6 @@ else:
     puntos = st.session_state.puntos
     total = total_preguntas
 
-    # Guardar ranking
     guardar_ranking(st.session_state.nombre_usuario, puntos)
 
     st.metric("Puntuación Final", f"{puntos} / {total}")
@@ -250,6 +254,7 @@ else:
 
     if st.button("Reintentar"):
 
+        st.session_state.nombre_usuario = ""
         st.session_state.indice = 0
         st.session_state.puntos = 0
         st.session_state.juego_terminado = False
@@ -258,4 +263,5 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
