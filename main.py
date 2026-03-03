@@ -11,9 +11,9 @@ st.markdown("""
 
 .stApp {
     background: linear-gradient(135deg, #020024, #043d7a, #021b3a);
-    background-size: cover;
 }
 
+/* patrón tecnológico */
 .stApp::before {
     content:"";
     position: fixed;
@@ -29,8 +29,8 @@ st.markdown("""
     pointer-events:none;
 }
 
-h1, h2, h3, p {
-    color: #e6f7ff;
+h1,h2,h3,p{
+    color:#e6f7ff;
 }
 
 </style>
@@ -110,24 +110,18 @@ if "indice" not in st.session_state:
     st.session_state.juego_terminado = False
     st.session_state.start_time = time.time()
 
-# --- INTERFAZ ---
-st.title("⚡ Aprendiendo Electrónica Digital")
-st.divider()
-
 total_preguntas = len(st.session_state.pool_preguntas)
 
-# Barra de progreso
-st.progress(st.session_state.indice / total_preguntas)
-
-# ================= TIMER =================
+# ================= TIMER EN TIEMPO REAL (SOLO SE AÑADIÓ ESTO) =================
 
 TIEMPO_LIMITE = 10
 
 def tiempo_restante():
     transcurrido = time.time() - st.session_state.start_time
-    return max(0, int(TIEMPO_LIMITE - transcurrido))
+    return max(0, TIEMPO_LIMITE - int(transcurrido))
 
 def avanzar_pregunta(correcto=False):
+
     if correcto:
         st.session_state.puntos += 1
 
@@ -139,10 +133,11 @@ def avanzar_pregunta(correcto=False):
 
     st.rerun()
 
-def tiempo_agotado():
-    st.error("⏰ Tiempo agotado! Se cuenta como respuesta incorrecta.")
-    time.sleep(1)
-    avanzar_pregunta(correcto=False)
+# --- INTERFAZ ---
+st.title("⚡ Aprendiendo Electrónica Digital")
+st.divider()
+
+st.progress(st.session_state.indice / total_preguntas)
 
 # ================= PANTALLA DEL JUEGO =================
 
@@ -150,16 +145,18 @@ if not st.session_state.juego_terminado:
 
     pregunta_actual = st.session_state.pool_preguntas[st.session_state.indice]
 
-    t_rest = tiempo_restante()
+    tiempo = tiempo_restante()
 
     st.subheader(f"Pregunta {st.session_state.indice + 1} de {total_preguntas}")
     st.write(f"### {pregunta_actual['p']}")
 
-    st.info(f"⏳ Tiempo restante: {t_rest} s")
+    st.info(f"⏳ Tiempo restante: {tiempo} s")
 
-    # Si el tiempo se acaba automáticamente
-    if t_rest <= 0:
-        tiempo_agotado()
+    # Si el tiempo se acaba se avanza automáticamente
+    if tiempo <= 0:
+        st.error("⏰ Tiempo agotado! Se cuenta como respuesta incorrecta.")
+        time.sleep(1)
+        avanzar_pregunta(False)
 
     opciones = pregunta_actual["o"]
 
@@ -174,11 +171,12 @@ if not st.session_state.juego_terminado:
         if seleccion == pregunta_actual["c"]:
             st.success("✅ ¡Correcto!")
             time.sleep(1)
-            avanzar_pregunta(correcto=True)
+            avanzar_pregunta(True)
+
         else:
             st.error(f"❌ Incorrecto. La respuesta correcta es: {pregunta_actual['c']}")
             time.sleep(1)
-            avanzar_pregunta(correcto=False)
+            avanzar_pregunta(False)
 
 else:
 
@@ -194,17 +192,14 @@ else:
     if puntos >= 20:
         st.balloons()
         st.snow()
-        st.success("🎉🔥🤩 Excelente! Máximo nivel dominado 🔥🎊🥳")
+        st.success("🎉 Excelente dominio")
     elif puntos >= 18:
         st.balloons()
-        st.success("🎈🚀🌟 ¡Casi perfecto! Muy buen desempeño 🌟🚀🎈")
-    elif porcentaje >= 80:
-        st.balloons()
-        st.success("🌟 Excelente dominio de Electrónica Digital")
+        st.success("🎈 Muy buen desempeño")
     elif porcentaje >= 60:
-        st.info("👍 Buen trabajo, pero puedes mejorar")
+        st.info("👍 Buen trabajo")
     else:
-        st.warning("📘 Debes repasar los conceptos básicos")
+        st.warning("📘 Debes repasar")
 
     if st.button("Reintentar"):
         st.session_state.indice = 0
@@ -213,4 +208,3 @@ else:
         random.shuffle(st.session_state.pool_preguntas)
         st.session_state.start_time = time.time()
         st.rerun()
-
