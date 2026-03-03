@@ -1,86 +1,94 @@
-import streamlit as st
+﻿import streamlit as st
 import random
 import time
 
-# --- CONFIGURACIÓN DE LA PÁGINA ---
-st.set_page_config(page_title="Trivia Master IUT", page_icon="💰")
+st.set_page_config(page_title="Aprendiendo Electrónica Digital ⚡", page_icon="⚡")
 
-# --- 1. BASE DE DATOS DE PRUEBA (El "Pool" de 10 preguntas) ---
-# Instrucción para el alumno: "Aquí es donde añades tus preguntas de TDA"
-if 'pool_preguntas' not in st.session_state:
-    st.session_state.pool_preguntas = [
-        {"p": "¿Cuál es la capital de Venezuela?", "o": ["Maracaibo", "Caracas", "Valencia", "Coro"], "c": "Caracas"},
-        {"p": "¿Qué planeta es conocido como el Planeta Rojo?", "o": ["Venus", "Marte", "Júpiter", "Saturno"], "c": "Marte"},
-        {"p": "¿Cuántos bits tiene un byte?", "o": ["4", "16", "32", "8"], "c": "8"},
-        {"p": "¿Quién pintó la Mona Lisa?", "o": ["Dali", "Picasso", "Da Vinci", "Van Gogh"], "c": "Da Vinci"},
-        {"p": "¿Cuál es el metal más caro del mundo?", "o": ["Oro", "Platino", "Rodio", "Cobre"], "c": "Rodio"},
-        {"p": "¿Qué animal es la mascota de Linux?", "o": ["Gato", "Pingüino", "Perro", "Elefante"], "c": "Pingüino"},
-        {"p": "¿En qué año llegó el hombre a la Luna?", "o": ["1965", "1972", "1969", "1980"], "c": "1969"},
-        {"p": "¿Cuál es el río más largo del mundo?", "o": ["Amazonas", "Nilo", "Orinoco", "Misisipi"], "c": "Amazonas"},
-        {"p": "¿Qué elemento químico tiene el símbolo 'O'?", "o": ["Oro", "Osmio", "Oxígeno", "Hierro"], "c": "Oxígeno"},
-        {"p": "¿Cuál es el lenguaje de programación de esta App?", "o": ["Java", "C++", "Python", "PHP"], "c": "Python"}
-    ]
-    # Mezclamos el pool para que no siempre salgan igual
-    random.shuffle(st.session_state.pool_preguntas)
+# --- BANCO GRANDE DE PREGUNTAS (puedes agregar más aquí) ---
+banco_preguntas = [
 
-# --- 2. GESTIÓN DEL ESTADO DEL JUEGO ---
-# Usamos session_state para que la App "recuerde" en qué pregunta vamos
-if 'indice' not in st.session_state:
+    {"p": "¿Cuántos bits tiene un nibble?", 
+     "o": ["2 bits", "4 bits", "8 bits", "16 bits"], 
+     "c": "4 bits"},
+
+    {"p": "¿Cuántos bits tiene un byte?", 
+     "o": ["4", "8", "16", "32"], 
+     "c": "8"},
+
+    {"p": "¿Cuál es la salida de una compuerta AND si ambas entradas son 1?", 
+     "o": ["0", "1", "Depende del voltaje", "Indefinido"], 
+     "c": "1"},
+
+    {"p": "¿Qué compuerta invierte su entrada?", 
+     "o": ["AND", "OR", "NOT", "XOR"], 
+     "c": "NOT"},
+
+    {"p": "¿Qué número decimal representa el binario 1101?", 
+     "o": ["11", "12", "13", "14"], 
+     "c": "13"},
+
+    {"p": "¿Cuántos valores puede representar 4 bits?", 
+     "o": ["8", "12", "16", "32"], 
+     "c": "16"},
+
+    {"p": "¿Qué compuerta es la negación de AND?", 
+     "o": ["NOR", "NAND", "XOR", "NOT"], 
+     "c": "NAND"},
+
+    {"p": "¿Qué compuerta es la negación de OR?", 
+     "o": ["NAND", "NOR", "XOR", "NOT"], 
+     "c": "NOR"},
+
+    {"p": "¿Cuál es el resultado de 1 AND 0?", 
+     "o": ["0", "1", "Indefinido", "Depende"], 
+     "c": "0"},
+
+    {"p": "¿Cuál es el resultado de NOT 1?", 
+     "o": ["0", "1", "Indefinido", "2"], 
+     "c": "0"},
+
+    # Puedes agregar 20 más aquí 👇
+]
+
+# --- FUNCIÓN PARA INICIAR EXAMEN NUEVO ---
+def iniciar_examen():
+    st.session_state.pool_preguntas = random.sample(banco_preguntas, 5)  # Toma 5 aleatorias
     st.session_state.indice = 0
     st.session_state.puntos = 0
     st.session_state.juego_terminado = False
 
-# --- 3. FUNCIONES DE AUDIO ---
-# Nota para el alumno: Streamlit puede reproducir audio desde una URL
-def reproducir_sonido(url):
-    st.markdown(f'<audio src="{url}" autoplay style="display:none"></audio>', unsafe_allow_html=True)
+# Inicialización
+if 'pool_preguntas' not in st.session_state:
+    iniciar_examen()
 
-# --- 4. INTERFAZ VISUAL ---
-st.title("💰 ¿Quién quiere ser Ingeniero TDA?")
+# --- INTERFAZ ---
+st.title("⚡ Aprendiendo Electrónica Digital")
 st.divider()
 
+total_preguntas = len(st.session_state.pool_preguntas)
+
+progreso = st.session_state.indice / total_preguntas
+st.progress(progreso)
+
 if not st.session_state.juego_terminado:
-    # Obtenemos la pregunta actual del pool
+
     pregunta_actual = st.session_state.pool_preguntas[st.session_state.indice]
-    
-    st.subheader(f"Pregunta {st.session_state.indice + 1}:")
+
+    st.subheader(f"Pregunta {st.session_state.indice + 1} de {total_preguntas}")
     st.write(f"### {pregunta_actual['p']}")
-    
-    # Creamos los botones para las opciones
-    # El alumno puede cambiar el diseño de estos botones
-    opciones = pregunta_actual['o']
-    
-    # Usamos columnas para que parezca el tablero del programa de TV
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        btn_a = st.button(f"A) {opciones[0]}", use_container_width=True)
-        btn_b = st.button(f"B) {opciones[1]}", use_container_width=True)
-    with col2:
-        btn_c = st.button(f"C) {opciones[2]}", use_container_width=True)
-        btn_d = st.button(f"D) {opciones[3]}", use_container_width=True)
 
-    # Lógica de respuesta
-    seleccion = None
-    if btn_a: seleccion = opciones[0]
-    if btn_b: seleccion = opciones[1]
-    if btn_c: seleccion = opciones[2]
-    if btn_d: seleccion = opciones[3]
+    seleccion = st.radio("Selecciona una respuesta:", pregunta_actual['o'])
 
-    if seleccion:
+    if st.button("Confirmar respuesta"):
         if seleccion == pregunta_actual['c']:
-            st.success("¡CORRECTO! 🌟")
-            # AQUÍ PODRÍAS PONER UN SONIDO DE VICTORIA
-            # reproducir_sonido("URL_DE_SONIDO_CORRECTO")
-            st.session_state.puntos += 2
-            time.sleep(1) # Pausa dramática
+            st.success("✅ Correcto")
+            st.session_state.puntos += 1
         else:
-            st.error(f"INCORRECTO. La respuesta era: {pregunta_actual['c']} ❌")
-            # reproducir_sonido("URL_DE_SONIDO_ERROR")
-            time.sleep(1)
+            st.error(f"❌ Incorrecto. Respuesta correcta: {pregunta_actual['c']}")
 
-        # Avanzamos a la siguiente pregunta
-        if st.session_state.indice < 4: # Solo jugamos 5 preguntas por ronda
+        time.sleep(1)
+
+        if st.session_state.indice < total_preguntas - 1:
             st.session_state.indice += 1
             st.rerun()
         else:
@@ -88,20 +96,9 @@ if not st.session_state.juego_terminado:
             st.rerun()
 
 else:
-    # PANTALLA FINAL
-    st.header("🏁 ¡Fin del Juego!")
-    st.metric("PUNTUACIÓN FINAL", f"{st.session_state.puntos} / 10")
-    
-    if st.session_state.puntos >= 8:
-        st.balloons()
-        st.success("¡Eres un experto! Ya puedes trabajar en la cabecera de la TDA.")
-    else:
-        st.warning("Sigue estudiando, la norma ISDB-Tb te espera.")
-    
-    if st.button("Reintentar"):
-        # Limpiamos todo para empezar de nuevo
-        st.session_state.indice = 0
-        st.session_state.puntos = 0
-        st.session_state.juego_terminado = False
-        random.shuffle(st.session_state.pool_preguntas)
+    st.header("🏁 Fin del examen")
+    st.metric("Puntuación Final", f"{st.session_state.puntos} / {total_preguntas}")
+
+    if st.button("Reintentar examen"):
+        iniciar_examen()  # 🔥 Aquí está la magia
         st.rerun()
