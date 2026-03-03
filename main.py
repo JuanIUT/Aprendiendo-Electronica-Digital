@@ -162,7 +162,7 @@ if 'pool_preguntas' not in st.session_state:
 
 # ================= TIMER =================
 
-TIEMPO_LIMITE = 10
+TIEMPO_LIMITE = 15
 
 def obtener_tiempo_restante():
     transcurrido = time.time() - st.session_state.start_time
@@ -263,5 +263,6 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
 
