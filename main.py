@@ -24,26 +24,10 @@ h1,h2,h3,p{
 """, unsafe_allow_html=True)
 
 # ================= LOGO SUPERIOR DERECHO =================
-logo_html = """
-<style>
-.logo_fixed {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-}
+col1, col2 = st.columns([6,1])
 
-.logo_fixed img {
-    width: 130px;
-}
-</style>
-
-<div class="logo_fixed">
-    <img src="unetrans_sin_fondo_lnegras.png">
-</div>
-"""
-
-st.markdown(logo_html, unsafe_allow_html=True)
+with col2:
+    st.image("unetrans_sin_fondo_lnegras.png", width=120)
 
 # ================= RANKING SISTEMA =================
 
@@ -286,6 +270,7 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
 
 
