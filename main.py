@@ -68,10 +68,10 @@ if "indice" not in st.session_state:
 
 def pantalla_bienvenida():
 
-    col1, col2, col3 = st.columns([0.1,6])
+    col1, col2, col3 = st.columns([0.1,5])
 
     with col2:
-        st.image("unetrans_sin_fondo_lnegras.png", width=500)
+        st.image("unetrans_sin_fondo_lnegras.png", width=200)
 
     st.title("🎯 BIENVENIDO A LA PRUEBA DE ELECTRONICA-DIGITAL")
 
@@ -269,6 +269,7 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
 
 
