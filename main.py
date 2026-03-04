@@ -24,7 +24,7 @@ h1,h2,h3,p{
 """, unsafe_allow_html=True)
 
 # ================= LOGO SUPERIOR DERECHO =================
-col1, col2 = st.columns([10,10])
+col1, col2 = st.columns([1,10])
 
 with col2:
     st.image("unetrans_sin_fondo_lnegras.png", width=1000)
@@ -270,6 +270,7 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
 
 
