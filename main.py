@@ -68,7 +68,7 @@ if "indice" not in st.session_state:
 
 def pantalla_bienvenida():
 
-    col1, col2, col3 = st.columns([0.1,5])
+    col1, col2, = st.columns([0.1,5])
 
     with col2:
         st.image("unetrans_sin_fondo_lnegras.png", width=200)
@@ -269,6 +269,7 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
 
 
