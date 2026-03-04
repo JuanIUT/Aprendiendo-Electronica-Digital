@@ -24,10 +24,10 @@ h1,h2,h3,p{
 """, unsafe_allow_html=True)
 
 # ================= LOGO SUPERIOR DERECHO =================
-col1, col2 = st.columns([6,1])
+col1, col2 = st.columns([10,1])
 
 with col2:
-    st.image("unetrans_sin_fondo_lnegras.png", width=200)
+    st.image("unetrans_sin_fondo_lnegras.png", width=500)
 
 # ================= RANKING SISTEMA =================
 
@@ -270,6 +270,7 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
 
 
