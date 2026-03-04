@@ -3,6 +3,7 @@ import random
 import time
 import pandas as pd
 import os
+st.write("Archivos en esta carpeta:", os.listdir())
 import base64   # ← agregado para el logo
 
 # ================= CONFIGURACIÓN =================
@@ -294,6 +295,7 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
 
 
