@@ -27,7 +27,7 @@ h1,h2,h3,p{
 col1, col2 = st.columns([6,1])
 
 with col2:
-    st.image("unetrans_sin_fondo_lnegras.png", width=120)
+    st.image("unetrans_sin_fondo_lnegras.png", width=200)
 
 # ================= RANKING SISTEMA =================
 
@@ -270,6 +270,7 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
 
 
