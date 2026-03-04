@@ -120,7 +120,7 @@ if 'pool_preguntas' not in st.session_state:
         {"p": "¿Qué número decimal representa el binario 1101?",
          "o": ["11", "12", "13", "14"],
          "c": "13"},
-        {"p": "¿Qué compuerta da salida 1 solo cuando las entradas son diferentes?",
+        {"p": "¿Qué compuerta proporciona salida 1 solo cuando las entradas son diferentes?",
          "o": ["AND", "OR", "XOR", "NAND"],
          "c": "XOR"},
         {"p": "¿Qué compuerta es la negación de AND?",
@@ -144,13 +144,13 @@ if 'pool_preguntas' not in st.session_state:
         {"p": "¿Cuántos valores puede representar 3 bits?",
          "o": ["4", "6", "8", "16"],
          "c": "8"},
-        {"p": "¿Cuál es el resultado de 1 AND 0?",
+        {"p": "¿Cuál es el resultado segun la tabla de la verdad para la compuerta AND con los valores 1 y 0?",
          "o": ["0", "1", "Indefinido", "Depende"],
          "c": "0"},
-        {"p": "¿Cuál es el resultado de 1 OR 0?",
+        {"p": "¿Cuál es el resultado segun la tabla de la verdad para la compuerta OR con los valores 1 y 0?",
          "o": ["0", "1", "Indefinido", "Depende"],
          "c": "1"},
-        {"p": "¿Cuál es el resultado de NOT 1?",
+        {"p": "¿Cuál es el resultado segun la tabla de la verdad para la compuerta NOT cuando vale 1?",
          "o": ["0", "1", "Indefinido", "2"],
          "c": "0"},
         {"p": "Un contador digital se utiliza para:",
@@ -269,6 +269,7 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
 
 
