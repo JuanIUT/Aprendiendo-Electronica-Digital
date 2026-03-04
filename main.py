@@ -25,34 +25,14 @@ h1,h2,h3,p{
 """, unsafe_allow_html=True)
 
 # ================= LOGO SUPERIOR DERECHO =================
-
-def cargar_logo(ruta):
-    with open(ruta, "rb") as img:
-        return base64.b64encode(img.read()).decode()
-
-logo_base64 = cargar_logo("unetrans_sin_fondo_lnegras.png")
-
-st.markdown(f"""
-<style>
-
-.logo-container {{
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
-}}
-
-.logo-container img {{
-    width: 130px;
-}}
-
-</style>
-
-<div class="logo-container">
-    <img src="data:image/png;base64,{logo_base64}">
-</div>
-
-""", unsafe_allow_html=True)
+st.markdown(
+    """
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 999;">
+        <img src="unetrans_sin_fondo_lnegras.png" width="130">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # ================= RANKING SISTEMA =================
 
@@ -295,6 +275,7 @@ else:
 
         st.session_state.start_time = time.time()
         st.rerun()
+
 
 
 
